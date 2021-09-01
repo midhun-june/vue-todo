@@ -6,7 +6,7 @@
       <div class="grid grid-cols-12 gap-4">
         <div class="col-span-6 space-y-4 px-1"
              style="height: 500px">
-          <div v-for="(todo, index) in todos"
+          <div v-for="(todo, index) in state.todos"
                :key="index"
                class="p-8 bg-white shadow-md rounded flex items-center justify-between"
                :class="{'bg-green-200': todo.done}">
@@ -16,15 +16,15 @@
             </div>
             <div class="space-x-2">
               <button class="px-2 text-red-600"
-                      @click="removeTodo(todo)"
+                      @click="removeTodo(index)"
                       title="Remove todo">&times;</button>
               <button v-if="!todo.done"
                       class="px-2 text-green-600"
-                      @click="markAsDone(todo)"
+                      @click="markAsDone(index)"
                       title="Mark as done">&check;</button>
               <button v-else
                       class="px-2 text-orange-600"
-                      @click="markAsUndone(todo)"
+                      @click="markAsUndone(index)"
                       title="Mark as undone">&#8630;</button>
             </div>
           </div>
@@ -58,6 +58,29 @@ setup(){
         todoText:'',
     });
 
+  function addTodo(){
+    state.todos.unshift({
+      text: state.todoText,
+      created_at:new Date(),
+      done:false,
+    })
+    state.todoText ='';
+  }
+
+  function markAsDone(index){
+    state.todos[index].done=true;
+  }
+  function markAsUndone(index){
+    state.todos[index].done=false;
+  }
+
+   function removeTodo(index) {
+      if (!confirm("Are you sure?")) {
+        return;
+      }
+     state.todos.splice(index,1);
+    }
+
 function getTodos(){
   axios.get('http://127.0.0.1:8000/api/todos').then(
     response => {
@@ -68,7 +91,11 @@ function getTodos(){
 
 getTodos();
     return {
-    state
+    state,
+    addTodo,
+    markAsDone,
+    markAsUndone,
+    removeTodo,
 }
 
 }
