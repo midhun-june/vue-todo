@@ -16,15 +16,15 @@
             </div>
             <div class="space-x-2">
               <button class="px-2 text-red-600"
-                      @click="removeTodo(index)"
+                      @click="removeTodo(todo)"
                       title="Remove todo">&times;</button>
               <button v-if="!todo.done"
                       class="px-2 text-green-600"
-                      @click="markAsDone(index)"
+                      @click="markAsDone(todo)"
                       title="Mark as done">&check;</button>
               <button v-else
                       class="px-2 text-orange-600"
-                      @click="markAsUndone(index)"
+                      @click="markAsUndone(todo)"
                       title="Mark as undone">&#8630;</button>
             </div>
           </div>
@@ -59,32 +59,51 @@ setup(){
     });
 
   function addTodo(){
-    state.todos.unshift({
-      text: state.todoText,
-      created_at:new Date(),
-      done:false,
-    })
-    state.todoText ='';
+
+    axios.post(process.env.VUE_APP_BASE_API_URL+'/store-todo',{
+      text:state.todoText,
+
+    }).then(()=>{
+       state.todoText ='';
+        getTodos();
+    });
+
+
   }
 
-  function markAsDone(index){
-    state.todos[index].done=true;
+  function markAsDone(todo){
+   axios.post(process.env.VUE_APP_BASE_API_URL+'/mark-as-done',{
+      id:todo.id
+
+    }).then(()=>{
+        getTodos();
+    });
   }
-  function markAsUndone(index){
-    state.todos[index].done=false;
+  function markAsUndone(todo){
+    axios.post(process.env.VUE_APP_BASE_API_URL+'/mark-as-undone',{
+      id:todo.id
+
+    }).then(()=>{
+        getTodos();
+    });
   }
 
-   function removeTodo(index) {
+   function removeTodo(todo) {
       if (!confirm("Are you sure?")) {
         return;
       }
-     state.todos.splice(index,1);
+    axios.post(process.env.VUE_APP_BASE_API_URL+'/delete-todo',{
+      id:todo.id
+
+    }).then(()=>{
+        getTodos();
+    });
     }
 
 function getTodos(){
-  axios.get('http://127.0.0.1:8000/api/todos').then(
+  axios.get(process.env.VUE_APP_BASE_API_URL+'/todos').then(
     response => {
-      console.log(response);
+      state.todos=response.data;
     }
   )
 }
