@@ -1,0 +1,7 @@
+/* ./src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.router-link-active {
+  background-color: rgb(106, 113, 211);
+}
